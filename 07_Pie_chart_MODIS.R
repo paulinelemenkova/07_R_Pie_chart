@@ -57,14 +57,14 @@ df2 <- df %>%
 p1<- ggplot(df, aes(x = "" , y = Value, fill = fct_inorder(Item))) +
     geom_col(width = 1, color = 1) +
     coord_polar(theta = "y") +
-    scale_fill_brewer(palette = "Spectral") +
+    scale_fill_brewer(palette = "Set3") +
     geom_label_repel(data = df2,
             aes(y = pos, label = paste0(Value, " (T ha)")),
             size = 5.5, nudge_x = 1, show.legend = FALSE,
             label.size = 0.5) +
-#    geom_text_repel(aes(alpha=0.5, size=1) +
     guides(fill = guide_legend(
-        title = "Land cover types: major categories for Italy in 2023. Data: MODIS",
+#        title = "Land cover types: major categories for Italy in 2023. Data: MODIS",
+        title = "2023",
         title.position = "top",
         position = "bottom")) +
     theme_void()
@@ -86,14 +86,15 @@ df2 <- df %>%
 p2<- ggplot(df, aes(x = "" , y = Value, fill = fct_inorder(Item))) +
     geom_col(width = 1, color = 1) +
     coord_polar(theta = "y") +
-    scale_fill_brewer(palette = "Spectral") +
+    scale_fill_brewer(palette = "Set3") +
     geom_label_repel(data = df2,
             aes(y = pos, label = paste0(Value, " (T ha)")),
             size = 5.5, nudge_x = 1, show.legend = FALSE,
             label.size = 0.5) +
 #    geom_text_repel(aes(alpha=0.5, size=1) +
     guides(fill = guide_legend(
-        title = "Land cover types: major categories for Italy in 2001. Data: MODIS",
+#       title = "Land cover types: major categories for Italy in 2001. Data: MODIS",
+        title = "2001",
         title.position = "top",
         position = "bottom")) +
     theme_void()
@@ -103,10 +104,17 @@ ggsave("my_plot.jpg", plot = p2, dpi = 300, width = 10,
     height = 10, units = "in")
 #--------- MY ---------------<
 
+library(grid)
 library(gridExtra)
-p3<- grid.arrange(p1, p2, ncol=2)
+p3<- grid.arrange(p2, p1, ncol=2,
+    top = textGrob("Land cover types: major categories for Italy. Data: MODIS",
+        gp = gpar(col = "black", fontsize = 14, fontfamily = "serif", fontface = "bold")
+        )
+    )
 p3
 
 ggsave("my_plot.jpg", plot = p3, dpi = 300,
     width = 15,
     height = 10, units = "in")
+
+ggsave("foo.pdf", arrangeGrob(p1, p2, nrow=1, ncol=2))
