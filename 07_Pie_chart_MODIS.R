@@ -104,8 +104,6 @@ ggsave("my_plot.jpg", plot = p2, dpi = 300, width = 10,
 #--------- MY ---------------<
 
 library(gridExtra)
-plot1 <- p1(1)
-plot2 <- p2(1)
 p3<- grid.arrange(p1, p2, ncol=2)
 p3
 
