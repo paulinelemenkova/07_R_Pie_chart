@@ -1,4 +1,7 @@
 # Libraries
+# install.packages("ggplot2")
+# install.packages("ggrepel")
+# install.packages("tidyverse")
 library(ggplot2)
 library(ggrepel)
 library(tidyverse)
@@ -23,13 +26,6 @@ ggplot(df, aes(x="", y=Value, fill=Item)) +
 #-------- EXAMPLE ------------->
 df <- data.frame(value = c(15, 25, 32, 28),
                  group = paste0("G", 1:4))
-# install.packages("ggplot2")
-# install.packages("ggrepel")
-# install.packages("tidyverse")
-library(ggplot2)
-library(ggrepel)
-library(tidyverse)
-
 # Get the positions
 df2 <- df %>%
   mutate(csum = rev(cumsum(rev(value))),
@@ -37,18 +33,19 @@ df2 <- df %>%
          pos = if_else(is.na(pos), value/2, pos))
 
 ggplot(df, aes(x = "" , y = value, fill = fct_inorder(group))) +
-  geom_col(width = 1, color = 1) +
-  coord_polar(theta = "y") +
-  scale_fill_brewer(palette = "Pastel1") +
-  geom_label_repel(data = df2,
+    geom_col(width = 1, color = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_brewer(palette = "Pastel1") +
+    geom_label_repel(data = df2,
                    aes(y = pos, label = paste0(value, "%")),
                    size = 4.5, nudge_x = 1, show.legend = FALSE) +
-  guides(fill = guide_legend(title = "Group")) +
-  theme_void()
+    geom_text_repel(aes(size = wt)) +
+    guides(fill = guide_legend(title = "Group")) +
+    theme_void()
 #-------- EXAMPLE -------------<
  
 
-#--------- MY --------------->
+#--------- MY 2023 --------------->
 df <- read_csv("LC_MODIS_2023.csv")
 head(df)
 
@@ -57,13 +54,61 @@ df2 <- df %>%
          pos = Value/2 + lead(csum, 1),
          pos = if_else(is.na(pos), Value/2, pos))
 
-ggplot(df, aes(x = "" , y = Value, fill = fct_inorder(Item))) +
-  geom_col(width = 1, color = 1) +
-  coord_polar(theta = "y") +
-  scale_fill_brewer(palette = "Pastel1") +
-  geom_label_repel(data = df2,
-                   aes(y = pos, label = paste0(Value, " (T ha)")),
-                   size = 5.5, nudge_x = 1, show.legend = FALSE) +
-  guides(fill = guide_legend(title = "Land cover types\n(major categories\nfor Italy in 2023\nMODIS)")) +
-  theme_void()
+p1<- ggplot(df, aes(x = "" , y = Value, fill = fct_inorder(Item))) +
+    geom_col(width = 1, color = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_brewer(palette = "Spectral") +
+    geom_label_repel(data = df2,
+            aes(y = pos, label = paste0(Value, " (T ha)")),
+            size = 5.5, nudge_x = 1, show.legend = FALSE,
+            label.size = 0.5) +
+#    geom_text_repel(aes(alpha=0.5, size=1) +
+    guides(fill = guide_legend(
+        title = "Land cover types: major categories for Italy in 2023. Data: MODIS",
+        title.position = "top",
+        position = "bottom")) +
+    theme_void()
+p1
+#
+ggsave("my_plot.jpg", plot = p1, dpi = 300, width = 10,
+    height = 10, units = "in")
 #--------- MY ---------------<
+
+#--------- MY 2001 --------------->
+df <- read_csv("LC_MODIS_2001.csv")
+head(df)
+
+df2 <- df %>%
+  mutate(csum = rev(cumsum(rev(Value))),
+         pos = Value/2 + lead(csum, 1),
+         pos = if_else(is.na(pos), Value/2, pos))
+
+p2<- ggplot(df, aes(x = "" , y = Value, fill = fct_inorder(Item))) +
+    geom_col(width = 1, color = 1) +
+    coord_polar(theta = "y") +
+    scale_fill_brewer(palette = "Spectral") +
+    geom_label_repel(data = df2,
+            aes(y = pos, label = paste0(Value, " (T ha)")),
+            size = 5.5, nudge_x = 1, show.legend = FALSE,
+            label.size = 0.5) +
+#    geom_text_repel(aes(alpha=0.5, size=1) +
+    guides(fill = guide_legend(
+        title = "Land cover types: major categories for Italy in 2001. Data: MODIS",
+        title.position = "top",
+        position = "bottom")) +
+    theme_void()
+p2
+#
+ggsave("my_plot.jpg", plot = p2, dpi = 300, width = 10,
+    height = 10, units = "in")
+#--------- MY ---------------<
+
+library(gridExtra)
+plot1 <- p1(1)
+plot2 <- p2(1)
+p3<- grid.arrange(p1, p2, ncol=2)
+p3
+
+ggsave("my_plot.jpg", plot = p3, dpi = 300,
+    width = 15,
+    height = 10, units = "in")
